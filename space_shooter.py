@@ -1,5 +1,9 @@
-# Pygame template - skeleton for a new pygame project
-from lib2to3.refactor import _EveryNode
+# Based on http://kidscancode.org/
+# Background from http://imgur.com/bHiPMju
+# Graphics from http://opengameart.org/content/space-shooter-redux
+# Art from Kenney.nl
+# Music from http://www.bfxr.net/
+# Frozen Jam by tgfcoder <https://twitter.com/tgfcoder> licensed under CC-BY-3
 
 import pygame
 from pygame import Color
@@ -49,16 +53,16 @@ class Mob(pygame.sprite.Sprite):
         self.image.fill(Color('red'))
         self.rect = self.image.get_rect()
 
-        self.gen_new_mob()
+        self.randomize_position()
 
     def update(self):
         self.rect.x += self.speed_x
         self.rect.y += self.speed_y
 
         if self.rect.top > HEIGHT or self.rect.right < 0 or self.rect.left > WIDTH:
-            self.gen_new_mob()
+            self.randomize_position()
 
-    def gen_new_mob(self):
+    def randomize_position(self):
         self.rect.x = random.randrange(WIDTH - self.rect.width)
         self.rect.y = random.randrange(-150, -100)
         self.speed_x = random.randrange(-3, 3)
