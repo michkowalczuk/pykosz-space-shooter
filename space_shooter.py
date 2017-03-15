@@ -9,9 +9,14 @@ import pygame
 from pygame import Color
 import random
 import os
+from os import path
 
 # center window position
 os.environ['SDL_VIDEO_CENTERED'] = '1'  # must be before pygame.init()!
+
+img_dir = path.join(path.dirname(__file__), 'img')
+snd_dir = path.join(path.dirname(__file__), 'snd')
+
 
 WIDTH = 480
 HEIGHT = 600
@@ -91,6 +96,13 @@ screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Pygame Template")
 clock = pygame.time.Clock()
 
+# load images
+background_img = pygame.image.load(path.join(img_dir, 'starfield.png')).convert()
+background_rect = background_img.get_rect()
+player_img = pygame.image.load(path.join(img_dir, 'playerShip1_orange.png')).convert()
+bullet_img = pygame.image.load(path.join(img_dir, 'laserRed16.png')).convert()
+meteor_img = pygame.image.load(path.join(img_dir, 'meteorBrown_med1.png')).convert()
+
 all_sprites = pygame.sprite.Group()
 player = Player()
 all_sprites.add(player)
@@ -122,8 +134,19 @@ while running:
     # UPDATE
     all_sprites.update()
 
+    hits = pygame.sprite.groupcollide(mobs, bullets, True, True)
+    for hit in hits:
+        mob = Mob()
+        all_sprites.add(mob)
+        mobs.add(mob)
+
+    hits = pygame.sprite.spritecollide(player, mobs, False)
+    if hits:
+        running = False
+
     # DRAW / RENDER
-    screen.fill(Color('black'))
+    # screen.fill(Color('black'))
+    screen.blit(background_img, background_rect)
     all_sprites.draw(screen)
 
     # *after* drawing everything, flip the display
