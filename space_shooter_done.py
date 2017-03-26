@@ -458,6 +458,7 @@ while running:
             player.powerup()
             gun_sound.play()
 
+
     # DRAW / RENDER
     screen.blit(background_img, background_rect)
     all_sprites.draw(screen)
