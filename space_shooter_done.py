@@ -62,6 +62,24 @@ def draw_lives(surf, x, y, lives, img):
         surf.blit(img, img_rect)
 
 
+### Game over screen
+def show_go_screen():
+    screen.blit(background_img, background_rect)
+    draw_text(screen, "PYKOSZ SHOOTER", 60, WIDTH / 2, HEIGHT / 4)
+    draw_text(screen, "Arrow keys move, Space to fire", 22,
+              WIDTH / 2, HEIGHT / 2)
+    draw_text(screen, "Press a key to begin", 18, WIDTH / 2, HEIGHT * 3 / 4)
+    pygame.display.flip()
+    waiting = True
+    while waiting:
+        clock.tick(FPS)
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+            if event.type == pygame.KEYUP:
+                waiting = False
+
+
 class Player(pygame.sprite.Sprite):
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
@@ -377,8 +395,22 @@ for i in range(5):
 # GAME LOOP
 score = 0
 pygame.mixer.music.play(loops=-1)
+game_over = True
 running = True
 while running:
+    if game_over:
+        show_go_screen()
+        game_over = False
+        all_sprites = pygame.sprite.Group()
+        mobs = pygame.sprite.Group()
+        bullets = pygame.sprite.Group()
+        powerups = pygame.sprite.Group()
+        player = Player()
+        all_sprites.add(player)
+        for i in range(8):
+            create_add_mob()
+        score = 0
+
     # keep loop running at the right speed
     clock.tick(FPS)
 
@@ -387,9 +419,9 @@ while running:
         # check for closing window
         if event.type == pygame.QUIT:
             running = False
-        # elif event.type == pygame.KEYDOWN:
-        #     if event.key == pygame.K_SPACE:
-        #         player.shoot()
+            # elif event.type == pygame.KEYDOWN:
+            #     if event.key == pygame.K_SPACE:
+            #         player.shoot()
 
     # UPDATE
     all_sprites.update()
@@ -441,13 +473,11 @@ while running:
             ### Gun powerups
             player.power = 1
 
-    if player.lives == 0 and not death_explosion.alive():
-        running = False
-
-    ### Powerups - Colliding with the player
     # check to see if player hit a powerup
     player_powerup_hit = pygame.sprite.spritecollide(player, powerups, True)
+    ### Powerups - Colliding with the player
     for hit in player_powerup_hit:
+
         if hit.type == 'shield':
             player.shield += random.randrange(10, 30)  # random or const
             if player.shield >= 100:
@@ -458,12 +488,16 @@ while running:
             player.powerup()
             gun_sound.play()
 
+    ### game over part
+    if player.lives == 0 and not death_explosion.alive():
+        game_over = True
+
 
     # DRAW / RENDER
+    # shieldbar display
     screen.blit(background_img, background_rect)
     all_sprites.draw(screen)
 
-    # shieldbar display
     draw_text(screen, str(score), 18, WIDTH / 2, 10)
     draw_shield_bar(screen, 5, 5, player.shield)
 
